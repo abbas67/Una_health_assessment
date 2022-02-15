@@ -34,6 +34,4 @@ def execute_query(con, sql, query_params):
     """
     cur = con.cursor()
     cur.execute(sql, (query_params,))
-    # So it is easier to work with in the future...
-    return list(cur.fetchall())
-
+    return cur.fetchall()

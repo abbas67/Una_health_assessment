@@ -10,8 +10,8 @@ def load_files():
     Loading sample data in memory ready to be inserted into rows in the database.
     :return: Dictionary containing all 3 sample data provided in the format of a dictionary.
     """
-    sample_data_dict = {'user_a.csv': [], 'user_b.csv': [], 'user_c.csv': [], 'bruce_wayne.csv': []}
-    for filename in ['user_a.csv', 'user_b.csv', 'user_c.csv', 'bruce_wayne.csv']:
+    sample_data_dict = {'bruce_wayne.csv': [],'user_a.csv': [], 'user_b.csv': [], 'user_c.csv': []}
+    for filename in ['bruce_wayne.csv', 'user_a.csv', 'user_b.csv', 'user_c.csv', ]:
 
         with open(os.path.join(os.path.dirname(__file__), 'sample-data', filename)) as sample_data:
 
@@ -33,18 +33,27 @@ def insert_into_db(glucose_data_sets):
                    (recording_id integer NOT NULL,
                     user_id text NOT NULL,
                     timestamp text NOT NULL,
-                    recording integer NOT NULL)''')
+                    recording integer NOT NULL,
+                    serial_number text NOT NULL,
+                    device text NOT NULL,
+                    recording_type text NOT NULL)''')
 
     # There's a better way to do this 100% but in the interest of time...
-    row_id = 0
+    row_id = 1
 
     for dataset_name, data in glucose_data_sets.items():
         for row in data:
             #  We don't want the file type in the DB.
             user_id = dataset_name.replace('.csv', '')
             # Insert a row of data, converting from german to english
-            sql = "INSERT INTO levels VALUES (?,?,?,?)"
-            cur.execute(sql, [row_id, user_id, row['Gerätezeitstempel'], row['Glukosewert-Verlauf mg/dL']])
+            sql = "INSERT INTO levels VALUES (?,?,?,?,?,?, ?)"
+            cur.execute(sql, [row_id,
+                              user_id,
+                              row['Gerätezeitstempel'],
+                              row['Glukosewert-Verlauf mg/dL'],
+                              row['Seriennummer'],
+                              row['Gerät'],
+                              row['Aufzeichnungstyp']])
             # Save (commit) the changes
             con.commit()
             row_id = row_id+1

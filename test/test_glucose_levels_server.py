@@ -1,6 +1,5 @@
 import json
 import unittest
-from unittest import mock
 
 from glucose_levels_server import application
 
@@ -38,6 +37,32 @@ class TestGlucoseLevelsServer(unittest.TestCase):
             self.assertEqual(response.status_code, 400)
             response = client.get('/api/v1/levels/', data=json.dumps({"user": None}))
             self.assertEqual(response.status_code, 400)
+
+    def test_get_levels_by_recording_id_invalid_id(self):
+
+        with application.test_client() as client:
+
+            # Checking that the basic validation is working...
+            response = client.get('/api/v1/levels/SelinaKyle')
+            self.assertEqual(response.status_code, 400)
+
+            # Should be getting an error if nothing is found.
+            response = client.get('/api/v1/levels/10000000000')
+            self.assertEqual(response.status_code, 404)
+
+    def test_get_levels_by_recording_id_expected_request(self):
+
+        with application.test_client() as client:
+
+            # We expect data from the fake bruce wayne data...
+            response = client.get('/api/v1/levels/1')
+            self.assertEqual(json.loads(response.data), [1,
+                                                         "bruce_wayne",
+                                                         "18-02-2021 10:57",
+                                                         89,
+                                                         "1D48A10E-DDFB-4888-8158-026F08814833",
+                                                         "Batmobile Sensor",
+                                                         "0"])
 
 
 if __name__ == '__main__':
